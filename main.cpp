@@ -166,3 +166,31 @@ class Command : public Input
             }
         }
 };
+
+int main()
+{
+    int check = 0;
+    vector<char> vc1;
+    vector<char> vc2;
+    vector<string> vs1;
+    vector<string> vs2;
+    
+    Input in;
+    Command vc;
+    
+    in.recieveinput(check);
+    vc.parse_string(in.get_string());
+    
+    while(in.get_string() != "exit")
+    {
+        for(unsigned int i = 0; i < in.get_string().size(); i++)
+        {
+            if((in.get_string().at(i) == ';') || (in.get_string().at(i) == '&') || (in.get_string().at(i) == '|'))
+            {
+                check = 1;
+                vc1.push_back(in.get_string().at(i));
+            }
+        }
+    }
+}   
+
