@@ -181,6 +181,7 @@ int main()
     in.recieveinput(check);
     vc.parse_string(in.get_string());
     
+    unsigned int index = 0;
     while(in.get_string() != "exit")
     {
         for(unsigned int i = 0; i < in.get_string().size(); i++)
@@ -190,27 +191,30 @@ int main()
                 check = 1;
                 vc1.push_back(in.get_string().at(i));
             }
-        }
+            ++index;
+        }    
+
         if(check == 0)
         {
             int cmdcount = 1;
-            exc_command(command, cmdcount);
+            vc.exc_command(in.get_string(), cmdcount);       
         }
+        
         else if(check == 1)
         {
             string tmp = "";
         
             char *inp;
         
-            inp = new char[command.length()];
-            for(unsigned int i = 0; i < command.length(); i++)
+            inp = new char[in.get_string().length()];
+            for(unsigned int i = 0; i < in.get_string().length(); i++)
             {
-                inp[i] = command[i];
+                inp[i] = in.get_string()[i];
             }
-            inp[command.length()] = '\0';
+            inp[in.get_string().length()] = '\0';
         
             char *pnt;
-            pnt = strtok(inp, ";&&||\n ");
+            pnt = strtok(inp, ";&&||");
             while(pnt != NULL)
             {
                 int i = 0;
@@ -219,7 +223,6 @@ int main()
                     tmp += pnt[i];
                     i++;
                 }
-                
                 if(tmp.at(0) == ' ')
                 {
                     string tmpA = tmp;
@@ -235,7 +238,7 @@ int main()
                     }
                 }
                 vs1.push_back(tmp);
-                pnt = strtok(NULL,";&&||\n ");
+                pnt = strtok(NULL,";&&||");
                 tmp.clear();
             }
             vs2 = vs1;
@@ -254,9 +257,13 @@ int main()
             int cmdcnt = 0;
             int skp = 0;
         
-            char track = vc1.at(vc1.size()-1);
-            string track2 = vs1.at(vs1.size()-1);
-            exc_command(track2, cmdcnt);
+            char track = vc1.at(vc1.size() - 1);
+            string track2 = vs1.at(vs1.size() - 1);
+
+            Command vect;
+            vect.parse_string(track2);
+            
+            vect.exc_command(track2, cmdcnt);
             vs1.pop_back();
             do
             {
@@ -269,11 +276,15 @@ int main()
                 {
                     vc1.pop_back();
                     vc1.pop_back();
+                    
                     if((vs1.size() != 0) && (vc1.size() != 0))
                     {
                         track = vc1.at(vc1.size() - 1);
-                        track2 = vs1.at(vs1.size() - 1);  
-                        exc_command(track2, cmdcnt);
+                        track2 = vs1.at(vs1.size() - 1);
+                        
+                        vect.get_vector().clear();
+                        vect.parse_string(track2);
+                        vect.exc_command(track2, cmdcnt);
                         vs1.pop_back();
                     }
                     skp = 1;
@@ -292,7 +303,9 @@ int main()
                     if(vs1.size() != 0)
                     {
                         track2 = vs1.at(vs1.size() - 1);
-                        exc_command(track2, cmdcnt);
+                        vect.get_vector().clear();
+                        vect.parse_string(track2);
+                        vect.exc_command(track2, cmdcnt);
                         vs1.pop_back();
                     }
                     skp = 1;
@@ -305,5 +318,68 @@ int main()
                         skp = 1;
                 }
                 skp = 0;
-
-
+                if(vc1.size() != 0)
+                {
+                    track = vc1.at(vc1.size() - 1);
+                }
+                else
+                {
+                    track = '0';
+                }
+                if(vs1.size() != 0)
+                {
+                    track2 = vs1.at(vs1.size() - 1);
+                }
+                else
+                {
+                    track2 = "";
+                }
+                if((track == ';') && (track2.size() > 1))
+                {
+                    vect.get_vector().clear();
+                    vect.parse_string(track2);
+                    vect.exc_command(track2, cmdcnt);
+                    vs1.pop_back();
+                }
+                else if((track == '|') && (track2.size() > 1))
+                {
+                    if(cmdcnt == 0)
+                    {
+                        vect.get_vector().clear();
+                        vect.parse_string(track2);
+                        vect.exc_command(track2, cmdcnt);
+                        vs1.pop_back();
+                    }
+                }
+                else if((track == '&') && (track2.size() > 1))
+                {
+                    if(cmdcnt == 1)
+                    {
+                        vect.parse_string(track2);
+                        vect.exc_command(track2,cmdcnt);
+                        vs1.pop_back();
+                    }
+                }
+                else
+                {
+                    if(track2.size() > 1)
+                    {
+                        vect.get_vector().clear();
+                        vect.parse_string(track2);
+                        vect.exc_command(track2, cmdcnt);
+                        vs1.pop_back();   
+                    }
+                }
+            }
+            while((vc1.size() != 0) && (vs1.size() != 0));
+        }
+        vs1.clear();
+        vs2.clear();
+        vc1.clear();
+        vc2.clear();
+        in.get_string().clear();
+        in.recieveinput(check);
+    }
+    
+    return 0;
+}
