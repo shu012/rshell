@@ -191,6 +191,119 @@ int main()
                 vc1.push_back(in.get_string().at(i));
             }
         }
-    }
-}   
+        if(check == 0)
+        {
+            int cmdcount = 1;
+            exc_command(command, cmdcount);
+        }
+        else if(check == 1)
+        {
+            string tmp = "";
+        
+            char *inp;
+        
+            inp = new char[command.length()];
+            for(unsigned int i = 0; i < command.length(); i++)
+            {
+                inp[i] = command[i];
+            }
+            inp[command.length()] = '\0';
+        
+            char *pnt;
+            pnt = strtok(inp, ";&&||\n ");
+            while(pnt != NULL)
+            {
+                int i = 0;
+                while((pnt[i] != '\0') && (pnt[i] != '#'))
+                {
+                    tmp += pnt[i];
+                    i++;
+                }
+                
+                if(tmp.at(0) == ' ')
+                {
+                    string tmpA = tmp;
+                    tmp.clear();
+                    for(unsigned int i = 0; i < tmpA.size(); i++)
+                    {
+                        if(i == 0)
+                        {}
+                        else
+                        {
+                            tmp += tmpA.at(i);
+                        }
+                    }
+                }
+                vs1.push_back(tmp);
+                pnt = strtok(NULL,";&&||\n ");
+                tmp.clear();
+            }
+            vs2 = vs1;
+            vc2 = vc1;
+            vc1.clear();
+            vs1.clear();
+            for(int i = vs2.size() - 1; i > -1; i--)
+            {
+                vs1.push_back(vs2.at(i));
+            }
+            for(int i = vc2.size() - 1; i > -1; i--)
+            {
+                vc1.push_back(vc2.at(i));
+            }
+        
+            int cmdcnt = 0;
+            int skp = 0;
+        
+            char track = vc1.at(vc1.size()-1);
+            string track2 = vs1.at(vs1.size()-1);
+            exc_command(track2, cmdcnt);
+            vs1.pop_back();
+            do
+            {
+                if(track == ';')
+                {
+                    vc1.pop_back();
+                    skp = 1;
+                }
+                if((track == '&') && (cmdcnt == 1) && (skp == 0))
+                {
+                    vc1.pop_back();
+                    vc1.pop_back();
+                    if((vs1.size() != 0) && (vc1.size() != 0))
+                    {
+                        track = vc1.at(vc1.size() - 1);
+                        track2 = vs1.at(vs1.size() - 1);  
+                        exc_command(track2, cmdcnt);
+                        vs1.pop_back();
+                    }
+                    skp = 1;
+                }
+                else if((track == '&') && (cmdcnt == 0) && (skp == 0))
+                {
+                    vc1.pop_back();
+                    vc1.pop_back();
+                    vs1.pop_back();
+                    skp = 1;
+                }
+                if((track == '|') && (cmdcnt == 0) && (skp == 0))
+                {
+                    vc1.pop_back();
+                    vc1.pop_back();
+                    if(vs1.size() != 0)
+                    {
+                        track2 = vs1.at(vs1.size() - 1);
+                        exc_command(track2, cmdcnt);
+                        vs1.pop_back();
+                    }
+                    skp = 1;
+                }
+                else if((track == '|') && (cmdcnt == 1 ) && (skp = 0))
+                {
+                        vc1.pop_back();
+                        vc1.pop_back();
+                        vs1.pop_back();
+                        skp = 1;
+                }
+                skp = 0;
+
 
