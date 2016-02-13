@@ -98,10 +98,18 @@ $: exit
 $: exit
 ```
 
-Commands that include comments will print out the entire comment, rather than ignoring the comment.  For example:
+Single commands that include comments will print out the entire comment, rather than ignoring the comment.  Multiple commands that include comments execute successfully.  For example:
+
+Single Command:
 ```
-$: echo hello ##comment
-hello ##comment
+$: echo hello #comment
+hello #comment
+```
+Multiple Commands:
+```
+$: echo hello ; ls #comment
+hello
+//List of Directories
 ```
 
 ## Contributors
