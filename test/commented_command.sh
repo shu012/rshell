@@ -2,11 +2,10 @@
 
 make -C ..
 ./../a.out << 'EOF'
-ls -a #mkdir one
-echo hello
+ls ; echo hello #r
 exit
-EOF 
+EOF
+
+
 
 printf "\n"
-ls
-
