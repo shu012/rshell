@@ -1,5 +1,5 @@
 COMPILE = g++ 
-FLAGS = -Wall -Werror -ansi -pendantic 
+FLAGS = -Wall -Werror -ansi -pedantic 
 SRCDIR = src/main.cpp
 
 all: 
