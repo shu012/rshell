@@ -125,13 +125,13 @@ class Command : public Input
                 arg[0] = (char*)tempA.c_str();
                 arg[1] = NULL;
             }
-            if(tempC.size() == 0)
+            else if(tempC.size() == 0)
             {
                 arg[0] = (char*)tempA.c_str();
                 arg[1] = (char*)tempB.c_str();
                 arg[2] = NULL;
             }
-            if(tempD.size() == 0)
+            else if(tempD.size() == 0)
             {
                 arg[0] = (char*)tempA.c_str();
                 arg[1] = (char*)tempB.c_str();
