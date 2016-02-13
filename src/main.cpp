@@ -50,7 +50,7 @@ class Command : public Input
         {
             for(unsigned int i = 0; i < v.size(); ++i)
             {
-                v.at(i) = "";
+                v.at(i) = '\0';
             }
         }
         
@@ -146,7 +146,6 @@ class Command : public Input
                 arg[4] = (char*)tempD.c_str();
                 arg[5] = NULL;
             }
-            
             pid_t pid = fork();
             if(pid == 0)
             {
