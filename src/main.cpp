@@ -128,7 +128,54 @@ class Command
         
         bool check_test(string cmd,int& passed)
         {
-            //needs to be added
+            Command test;
+            //cout << "line 132" << endl;//delete 
+            if(cmd.at(0) =='[')
+            {
+                //cout << "line 135" << endl;//delete 
+                int j = 2;
+                for(unsigned int i = 0; i < cmd.size() - 4; ++i)
+                {
+                    cmd.at(i) = cmd.at(j);
+                    ++j;
+                }
+
+                cmd.resize(cmd.size()-4);
+                test.testcommand(cmd,passed);
+                
+                return true;
+            }
+            //cout << "line 150" << endl;//delete 
+            string t = "test ";
+            int cnt = 0;
+            if(cmd.size() > 5)
+            {
+                //cout << "line 156" << endl;//delete 
+                for(int i = 0; i < 5; ++i)
+                {
+                    if(cmd.at(i) == t.at(i))    
+                    {
+                        ++cnt;
+                    }
+                }
+            }
+            //cout << "line 163" << endl;//delete 
+            if(cnt == 5)
+            {
+                //cout << "line 167" << endl;//delete 
+                for(unsigned int i = 0; i < cmd.size() - 5; ++ i)
+                {
+                    cmd.at(i) = cmd.at(cnt);
+                    ++cnt;
+                }
+                //cout << "line 172" << endl;//delete 
+                cmd.resize(cmd.size()-5);
+                test.testcommand(cmd,passed);
+                
+                return true;
+            }
+            
+            return false;
         }
         
         void testcommand(string command,int& passed)
