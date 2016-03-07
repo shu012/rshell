@@ -20,7 +20,7 @@ exit
 EOF
 
 printf "\n"
+rm -r test
 ls
-rm -rf test
 
 
