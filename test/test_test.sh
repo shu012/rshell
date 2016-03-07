@@ -1,7 +1,7 @@
 #!/bin/sh
 
 make -C ..
-./../a.out << 'EOF'
+./../bin/rshell << 'EOF'
 mkdir test
 test -e test
 [ -e test ]
