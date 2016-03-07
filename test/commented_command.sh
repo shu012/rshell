@@ -2,10 +2,9 @@
 
 make -C ..
 ./../a.out << 'EOF'
-ls ; echo hello #r
+(ls && ls) && ls ### ls
 exit
 EOF
 
-
-
 printf "\n"
+ls
