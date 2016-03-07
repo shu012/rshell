@@ -1,7 +1,7 @@
 #!/bin/sh
 
 make -C ..
-./../a.out << 'EOF'
+./../bin/rshell << 'EOF'
 mkdir test
 test -e test
 [ -e test ]
@@ -10,8 +10,10 @@ test -e test && ls
 exit
 EOF
 
+printf "\n"
+
 make -C ..
-./../a.out << 'EOF'
+./../bin/rshell << 'EOF'
 echo hello
 echo checking exit
 exit
