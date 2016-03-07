@@ -494,7 +494,1199 @@ class Command
         
         void precedencecommand(string command,int& passed)
         {
-            //needs to be added
+            int i = 0;
+            string temp = "";
+            bool check_if_test;
+            int found_cmnt = 0;
+            vector<string> commands;
+            vector<char> connectors;
+            vector<string> commands_reverse;
+            vector<char> connectors_reverse;
+            Command cnd;
+
+            if(command.at(i) == '(')
+            {
+                i++;
+                while(command.at(i) != '(' || command.at(i) != ')' )
+                {
+                    temp += command.at(i);
+                    ++i;
+                    
+                    if(i == command.size()-1)
+                    {
+                        break;
+                    }
+                    
+                    else if(command.at(i) == '(' )
+                    {
+                        if(command.at(i-1) == ' ')
+                        {
+                            temp.resize(temp.size()-1);
+                        }
+                    }
+                    
+                    else if(command.at(i) == ')' )
+                    {
+                        break;
+                    }
+                    else if(command.at(i) == '#')
+                    {
+                        found_cmnt = 1;
+                        break;
+                    }
+                }
+            }
+            
+            else
+            {
+                while(command.at(i) != '(' || command.at(i) != ')' )
+                {
+                    temp += command.at(i);
+                    ++i;
+                    
+                    if(i == command.size()-1)
+                    {
+                        break;
+                    }
+                    
+                    else if(command.at(i) == '(' )
+                    {
+                        if(command.at(i-1) == ' ')
+                        {
+                            temp.resize(temp.size()-1);
+                        }
+                        break;
+                    }
+                    
+                    else if(command.at(i) == ')' )
+                    {
+                        temp.resize(temp.size()-1);
+                        break;
+                    }
+                    
+                    else if(command.at(i) == '#')
+                    {
+                        found_cmnt = 1;
+                        break;
+                    }
+                }
+            }
+
+            cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+            cnd.cmd_parse(temp, commands);//find commands and store in commands
+            commands_reverse = commands;
+            connectors_reverse = connectors;
+            commands_reverse.clear();
+            connectors_reverse.clear();
+            
+            for(int j = commands.size()-1; j > -1; j--)
+            {
+                commands_reverse.push_back(commands.at(j));
+            }
+            
+            for(int k = connectors.size()-1; k > -1; k--)
+            {
+                connectors_reverse.push_back(connectors.at(k));
+            }
+            
+            if(commands.size() == 1)
+            {
+                passed = 1;
+                check_if_test = cnd.check_test(commands.at(0),passed);
+                
+                if(!check_if_test)
+                {
+                    cnd.executecommand(commands.at(0),passed);
+                }
+            }
+            
+            else if(commands.size() > 1 )
+            {
+                cnd.mult_commands(commands_reverse,connectors_reverse,passed);
+
+                if(i != command.size() -1)
+                {
+                    if(command.at(i) == ')')
+                    {
+                        connectors_reverse.clear();
+                    }
+                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                    {
+                        i += 2;
+                    }
+                }
+
+                if(found_cmnt == 1)
+                {
+                    i = command.size()-1;
+                }
+            }
+
+            while(i != command.size()-1)
+            {
+                temp.clear();
+                
+                if(!connectors_reverse.empty())
+                {
+                    if(passed == 0 && connectors_reverse.at(0) == '&')
+                    {
+                        skip(command, i);
+                        if(i == command.size())
+                        {
+                            break;
+                        }
+                        temp.clear();
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        commands.clear();
+                        connectors.clear();
+                        
+                        if(command.at(i) == '(')
+                        {
+                            ++i;
+                            while(command.at(i) != '(' || command.at(i) != ')')
+                            {
+                                if(i == command.size()-1)
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                temp += command.at(i);
+                                ++i;
+                            }
+                        }
+                        
+                        cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                        cnd.cmd_parse(temp, commands);//find commands and store in commands
+                        commands_reverse = commands;
+                        connectors_reverse = connectors;
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        
+                        if(commands.size() > 1)
+                        {
+                            for(int j = commands.size()-j; i > -1; j--)
+                            {
+                                commands_reverse.push_back(commands.at(j));
+                            }
+                            for(int k = connectors.size()-1; k > -1; k--)
+                            {
+                                connectors_reverse.push_back(connectors.at(k));
+                            }
+                        }
+                        
+                        if(commands.size() == 1)
+                        {
+                            passed = 1;
+                            check_if_test = cnd.check_test(commands.at(0),passed);
+                            if(!check_if_test)
+                            {
+                                cnd.executecommand(commands.at(0),passed);
+                            }
+                        }
+                        else
+                        {
+                            cnd.mult_commands(commands,connectors,passed);
+                            if(i != command.size() -1)
+                            {
+                                if(command.at(i) == ')')
+                                {
+                                    connectors_reverse.clear();
+                                }
+                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                {
+                                    i += 2;
+                                }
+                            }
+                        }
+                        
+                        if(found_cmnt == 1)
+                        {
+                            i = command.size()-1;
+                        }
+                        
+                    }
+                    
+                    else if(passed == 1 && connectors_reverse.at(0) == '&')
+                    {
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        commands.clear();
+                        connectors.clear();
+                        
+                        if(command.at(i) == '(')
+                        {
+                            ++i;
+                            while(command.at(i) != '(' || command.at(i) != ')' )
+                            {
+                                if(i == command.size()-1)
+                                {
+                                    break;
+                                }
+                                
+                                if(command.at(i) == '(')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == ')')
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                
+                                else
+                                {
+                                    temp += command.at(i);
+                                    ++i;
+                                }
+                            }
+                        }
+                        
+                        else
+                        {
+                            while(command.at(i) != '(' || command.at(i) != ')')
+                            {
+                                if(i == command.size() - 1)
+                                {
+                                    temp += command.at(i);
+                                    break;
+                                }
+                                
+                                if(command.at(i) == '(')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == ')')
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == ' ')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                
+                                else
+                                {
+                                    temp += command.at(i);
+                                    ++i;
+                                }
+                            }
+                        }
+                        
+                        cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                        cnd.cmd_parse(temp, commands);//find commands and store in commands
+                        commands_reverse = commands;
+                        connectors_reverse = connectors;
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        
+                        if(commands.at(commands.size() - 1).size() == 0)
+                        {
+                            commands.pop_back();
+                        }
+                        
+                        if(commands.size() > 1)
+                        {
+                            for(int j = commands.size() - 1; j > -1; j--)
+                            {
+                                commands_reverse.push_back(commands.at(j));
+                            }
+                            
+                            for(int k = connectors.size()-1; k > -1; k--)
+                            {
+                                connectors_reverse.push_back(connectors.at(k));
+                            }
+                        }
+                        
+                        if(commands.size() == 1)
+                        {
+                            passed = 1;
+                            check_if_test = cnd.check_test(commands.at(0),passed);
+                            
+                            if(!check_if_test)
+                            {
+                                cnd.executecommand(commands.at(0),passed);
+                            }
+                        }
+                        
+                        else
+                        {
+                            cnd.mult_commands(commands,connectors,passed);
+                            if(i != command.size() -1)
+                            {
+                                if(command.at(i) == ')')
+                                {
+                                    connectors_reverse.clear();
+                                }
+                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                {
+                                    i += 2;
+                                }
+                            }
+                        }
+                        if(found_cmnt == 1)
+                        {
+                            i = command.size()-1;
+                        }
+                    }
+                    else if(passed == 1 && connectors_reverse.at(0) == '|')
+                    {
+                        skip(command, i);
+                        
+                        if(i == command.size())
+                        {
+                            break;
+                        }
+                        temp.clear();
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        commands.clear();
+                        connectors.clear();
+                        
+                        if(command.at(i) == '(')
+                        {
+                            ++i;
+                            while(command.at(i) != '(' || command.at(i) != ')')
+                            {
+                                if(i == command.size() - 1)
+                                {
+                                    break;
+                                }
+                                
+                                if(command.at(i) == '(')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == ')')
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                
+                                else
+                                {
+                                    temp += command.at(i);
+                                    ++i;
+                                }
+                            }
+                        }
+                        
+                        else
+                        {
+                            while(command.at(i) != '(' || command.at(i) != ')')
+                            {
+                                if(i == command.size() - 1)
+                                {
+                                    temp += command.at(i);
+                                    break;
+                                }
+                                
+                                if(command.at(i) == '(')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == ')')
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == ' ' && temp.size() == 0)
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                
+                                else
+                                {
+                                    temp += command.at(i);
+                                    ++i;
+                                }
+                            }
+                        }
+                        
+                        cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                        cnd.cmd_parse(temp, commands);//find commands and store in commands
+                        commands_reverse = commands;
+                        connectors_reverse = connectors;
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                    
+                        for(int j = commands.size() - 1; j > -1; j--)
+                        {
+                            commands_reverse.push_back(commands.at(j));
+                        }
+                        
+                        for(int k = connectors.size() - 1; k > -1; k--)
+                        {
+                            connectors_reverse.push_back(connectors.at(k));
+                        }
+                        
+                        if(connectors.at(0) == '|')
+                        {   
+                            commands_reverse.pop_back();
+                            connectors_reverse.pop_back();
+                            connectors_reverse.pop_back();
+                        }
+                        
+                        if(commands_reverse.empty() || connectors_reverse.empty())
+                        {
+                            break;
+                        }
+                        
+                        if(commands.size() == 1)
+                        {
+                            passed = 1;
+                            check_if_test = cnd.check_test(commands.at(0),passed);
+                            if(!check_if_test)
+                            {
+                                cnd.executecommand(commands.at(0),passed);
+                            }
+                        }
+                        
+                        else
+                        {
+                            cnd.mult_commands(commands,connectors,passed);
+
+                            if(i != command.size() - 1)
+                            {
+                                if(command.at(i) == ')')
+                                {
+                                    connectors_reverse.clear();
+                                }
+                                
+                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                {
+                                    i += 2;
+                                }
+                            }
+                        }
+                        
+                        if(found_cmnt == 1)
+                        {
+                            i = command.size() - 1;
+                        }
+                    }
+                    
+                    else if(passed == 0 && connectors_reverse.at(0) == '|')
+                    {
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        commands.clear();
+                        connectors.clear();
+                        
+                        if(command.at(i) == '(')
+                        {
+                            ++i;
+                            while(command.at(i) != '(' || command.at(i) != ')')
+                            {
+                                if(i == command.size() - 1)
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                
+                                temp += command.at(i);
+                                ++i;
+                            }
+                        }
+                        
+                        else
+                        {
+                            while(command.at(i) != '(' || command.at(i) != ')')
+                            {
+                                if(i == command.size()-1)
+                                {
+                                    temp += command.at(i);
+                                    break;
+                                }
+                                
+                                if(command.at(i) == '(')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == ')')
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == ' ')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                
+                                else
+                                {
+                                    temp += command.at(i);
+                                    ++i;
+                                }
+                            }
+                        }
+                        
+                        cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                        cnd.cmd_parse(temp, commands);//find commands and store in commands
+                        commands_reverse = commands;
+                        connectors_reverse = connectors;
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        
+                        if(commands.size() > 1)
+                        {
+                            for(int j = commands.size() - 1; j > -1; j--)
+                            {
+                                commands_reverse.push_back(commands.at(j));
+                            }
+                            
+                            for(int k = connectors.size()-1; k > -1; k--)
+                            {
+                                connectors_reverse.push_back(connectors.at(k));
+                            }
+                        }
+                        
+                        if(commands.size() == 1)
+                        {
+                            passed = 1;
+                            check_if_test = cnd.check_test(commands.at(0),passed);
+                            if(!check_if_test)
+                            {
+                                cnd.executecommand(commands.at(0),passed);
+                            }
+                        }
+                        else
+                        {
+                            cnd.mult_commands(commands,connectors,passed);
+                            if(i != command.size() - 1)
+                            {
+                                if(command.at(i) == ')')
+                                {
+                                    connectors_reverse.clear();
+                                }
+                                if(command.at(i) != command.size() && command.at(i + 1) != command.size())
+                                {
+                                    i += 2;
+                                }
+                            }
+                        }
+                        
+                        if(found_cmnt == 1)
+                        {
+                            i = command.size()-1;
+                        }
+                    }
+                    else if((passed == 0 || passed == 1) && connectors_reverse.at(0) == ';')
+                    {
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        commands.clear();
+                        connectors.clear();
+                        
+                        if(command.at(i) == '(')
+                        {
+                            ++i;
+                            while(command.at(i) != '(' || command.at(i) != ')' || command.at(i) != '\0')
+                            {
+                                if(i == command.size()-1)
+                                {
+                                    break;
+                                }
+                                if(command.at(i) == '(')
+                                { 
+                                    ++i;
+                                }
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                else
+                                {
+                                    temp += command.at(i);
+                                    ++i;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            while(command.at(i) != '(' || command.at(i) != ')')
+                            {
+                                if(i == command.size()-1)
+                                {
+                                    temp += command.at(i);
+                                    break;
+                                }
+                                
+                                if(command.at(i) == '(')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == ')')
+                                {
+                                    break;
+                                }
+                                
+                                else if(command.at(i) == ' ')
+                                {
+                                    ++i;
+                                }
+                                
+                                else if(command.at(i) == '#')
+                                {
+                                    found_cmnt = 1;
+                                    break;
+                                }
+                                
+                                else
+                                {
+                                    temp += command.at(i);
+                                    ++i;
+                                }
+                            }
+                        }
+                        
+                        cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                        cnd.cmd_parse(temp, commands);//find commands and store in commands
+                        commands_reverse = commands;
+                        connectors_reverse = connectors;
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        
+                        if(commands.size() > 1)
+                        {
+                            for(int j = commands.size()-1; j > -1; j--)
+                            {
+                                commands_reverse.push_back(commands.at(j));
+                            }
+                            for(int k = connectors.size()-1; k > -1; k--)
+                            {
+                                connectors_reverse.push_back(connectors.at(k));
+                            }
+                        }
+                        
+                        if(commands.size() == 1)
+                        {
+                            passed = 1;
+                            check_if_test = cnd.check_test(commands.at(0),passed);
+                            if(!check_if_test)
+                            {
+                                cnd.executecommand(commands.at(0),passed);
+                            }
+                        }
+                        else
+                        {
+                            cnd.mult_commands(commands,connectors,passed);
+                            if(i != command.size() -1)
+                            {
+                                if(command.at(i) == ')')
+                                {
+                                    connectors_reverse.clear();
+                                }
+                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                {
+                                    i += 2;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if(found_cmnt == 1)
+                    {
+                        i = command.size() - 1;
+                    }
+                }
+                else
+                {
+                    //move on check connector and use it as the new connector to compare
+                    commands_reverse.clear();
+                    connectors_reverse.clear();
+                    commands.clear();
+                    connectors.clear();
+                    int marker = 0;
+                    int secondmarker = 0;
+                    int found_cmnt = 0;
+                    
+                    if(command.at(i-1) == '(')
+                    {
+                        marker = 1;
+                    }
+                    
+                    while(command.at(i) != '(' || command.at(i) != ')' )
+                    {
+                        if(i == command.size() - 1)
+                        {
+                            break;
+                        }
+                        if(command.at(i) == '(')
+                        {
+                            marker += 1;
+                            ++i;
+                        }
+                        else if(command.at(i) == ' ' && temp.size() == 0)
+                        {
+                            ++i;
+                        }
+                        else if(command.at(i) == ')')
+                        {
+                            secondmarker += 1;
+                            if(i + 1 == command.size())
+                            {
+                                break;
+                            }
+                            else if(marker == secondmarker)
+                            {
+                                break;
+                            }
+                            ++i;
+                        }
+                        
+                        else if(command.at(i) == '#')
+                        {
+                            found_cmnt = 1;
+                            break;
+                        }
+                        
+                        else
+                        {
+                            temp += command.at(i);
+                            ++i;
+                        }
+                    }
+                    
+                    if(temp.at(temp.size() - 1) == ')' || temp.at(temp.size() - 1) == ' ')
+                    {
+                        temp.resize(temp.size()-1);
+                    }
+
+                    if(!temp.empty())
+                    {
+                        cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                        cnd.cmd_parse(temp, commands);//find commands and store in commands
+                        commands_reverse = commands;
+                        connectors_reverse = connectors;
+                        commands_reverse.clear();
+                        connectors_reverse.clear();
+                        
+                        if(commands.size() > 1)
+                        {
+                            for(int j = commands.size()-1; j > -1; j--)
+                            {
+                                commands_reverse.push_back(commands.at(j));
+                            }
+                            for(int k = connectors.size()-1; k > -1; k--)
+                            {
+                                connectors_reverse.push_back(connectors.at(k));
+                            }
+                        }
+                        
+                        if(passed == 1 && connectors.at(0) == '&')
+                        {
+                            if(commands.size() == 1)
+                            {
+                                passed = 1;
+                                check_if_test = cnd.check_test(commands.at(0),passed);
+                                if(!check_if_test)
+                                {
+                                    cnd.executecommand(commands.at(0),passed);
+                                }
+                            }
+                            else
+                            {
+                                cnd.mult_commands(commands,connectors,passed);
+                                if(i != command.size()-1)
+                                {
+                                    if(command.at(i) == ')')
+                                    {
+                                        connectors_reverse.clear();
+                                    }
+                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    {
+                                        i += 2;
+                                    }
+                                }
+                            }
+                            if(found_cmnt == 1)
+                            {
+                                i = command.size()-1;
+                                break;
+                            }
+                        }
+                        else if(passed == 0 && connectors.at(0) == '&')
+                        {
+                            skip(command, i);
+                            if(i == command.size())
+                            {
+                                break;
+                            }
+                            temp.clear();
+                            commands_reverse.clear();
+                            connectors_reverse.clear();
+                            commands.clear();
+                            connectors.clear();
+                            
+                            if(command.at(i) == '(')
+                            {
+                                ++i;
+                                while(command.at(i) != '(' || command.at(i) != ')')
+                                {
+                                    if(i == command.size()-1)
+                                    {
+                                        temp += command.at(i);
+                                        break;
+                                    }
+                                    if(command.at(i) == '(')
+                                    {
+                                        marker += 1;
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == ' ' && temp.size() == 0)
+                                    {
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == ')')
+                                    {
+                                        if(i+1 == command.size())
+                                        {
+                                            break;
+                                        }
+                                        else if(marker == 1)
+                                        {
+                                            break;
+                                        }
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == '#')
+                                    {
+                                        found_cmnt = 1;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        temp += command.at(i);
+                                        ++i;
+                                    }
+                                }
+                            }
+                            
+                            cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                            cnd.cmd_parse(temp, commands);//find commands and store in commands
+                            commands_reverse = commands;
+                            connectors_reverse = connectors;
+                            commands_reverse.clear();
+                            connectors_reverse.clear();
+                            
+                            if(commands.size() > 1)
+                            {
+                                for(int j = commands.size()-j; i > -1; j--)
+                                {
+                                    commands_reverse.push_back(commands.at(j));
+                                }
+                                for(int k = connectors.size()-1; k > -1; k--)
+                                {
+                                    connectors_reverse.push_back(connectors.at(k));
+                                }
+                            }
+                            
+                            if(commands.size() == 1)
+                            {
+                                passed = 1;
+                                check_if_test = cnd.check_test(commands.at(0),passed);
+                                if(!check_if_test)
+                                {
+                                    cnd.executecommand(commands.at(0),passed);
+                                }
+                            }
+                            else
+                            {
+                                cnd.mult_commands(commands,connectors,passed);
+                                if(i != command.size() -1)
+                                {
+                                    if(command.at(i) == ')')
+                                    {
+                                        connectors_reverse.clear();
+                                    }
+                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    {
+                                        i += 2;
+                                    }
+                                }
+                            }
+                            if(found_cmnt == 1)
+                            {
+                                i = command.size()-1;
+                                break;
+                            }
+                        }
+                        else if(passed == 1 && connectors.at(0) == '|')
+                        {
+                            skip(command, i);
+                            if(i == command.size())
+                            {
+                                break;
+                            }
+                            temp.clear();
+                            commands_reverse.clear();
+                            connectors_reverse.clear();
+                            commands.clear();
+                            connectors.clear();
+                            int marker = 0;
+                            
+                            if(command.at(i) == '(')
+                            {
+                                marker = 1;
+                                ++i;
+                                while(command.at(i) != '(' || command.at(i) != ')' )
+                                {
+                                    if(i == command.size()-1)
+                                    {
+                                        temp += command.at(i);
+                                        break;
+                                    }
+                                    if(command.at(i) == '(')
+                                    {
+                                        marker += 1;
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == ' ' && temp.size() == 0)
+                                    {
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == ')')
+                                    {
+                                        if(i+1 == command.size())
+                                        {
+                                            break;
+                                        }
+                                        else if(marker == 1)
+                                        {
+                                            break;
+                                        }
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == '#')
+                                    {
+                                        found_cmnt = 1;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        temp += command.at(i);
+                                        ++i;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                while(command.at(i) != '(' || command.at(i) != ')' )
+                                {
+                                    if(i == command.size()-1)
+                                    {
+                                        break;
+                                    }
+                                    if(command.at(i) == '(')
+                                    {
+                                        marker += 1;
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == ' ' && temp.size() == 0)
+                                    {
+                                        if(command.at(i+1) == command.size()-1)
+                                        {
+                                            break;
+                                        }
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == ')')
+                                    {
+                                        if(i+1 == command.size())
+                                        {
+                                            break;
+                                        }
+                                        else if(marker == 1)
+                                        {
+                                            break;
+                                        }
+                                        ++i;
+                                    }
+                                    else if(command.at(i) == '#')
+                                    {
+                                        found_cmnt = 1;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        temp += command.at(i);
+                                        ++i;
+                                    }
+                                }
+                            }
+                            
+                            if(temp.size() == 0)
+                            {
+                                break;
+                            }
+                            
+                            cnd.ctr_parse(temp, connectors);//find connectors and store in connectors 
+                            cnd.cmd_parse(temp, commands);//find commands and store in commands
+                            commands_reverse = commands;
+                            connectors_reverse = connectors;
+                            commands_reverse.clear();
+                            connectors_reverse.clear();
+
+                            for(int j = commands.size()-1; j > -1; j--)
+                            {
+                                commands_reverse.push_back(commands.at(j));
+                            }
+                            for(int k = connectors.size()-1; k > -1; k--)
+                            {
+                                connectors_reverse.push_back(connectors.at(k));
+                            }
+                            
+                            if(connectors.at(0) == '|')
+                            {   
+                                commands_reverse.pop_back();
+                                connectors_reverse.pop_back();
+                                connectors_reverse.pop_back();
+                            }
+                            
+                            if(commands_reverse.empty() || connectors_reverse.empty())
+                            {
+                                break;
+                            }
+                            
+                            if(commands.size() == 1)
+                            {
+                                passed = 1;
+                                check_if_test = cnd.check_test(commands.at(0),passed);
+                                if(!check_if_test)
+                                {
+                                    cnd.executecommand(commands.at(0),passed);
+                                }
+                            }
+                            else
+                            {
+                                cnd.mult_commands(commands,connectors,passed);
+                                if(i != command.size() -1)
+                                {
+                                    if(command.at(i) == ')')
+                                    {
+                                        connectors_reverse.clear();
+                                    }
+                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    {
+                                        i += 2;
+                                    }
+                                }
+                            }
+                            if(found_cmnt == 1)
+                            {
+                                i = command.size()-1;
+                                break;
+                            }
+                        }
+                        else if(passed == 0 && connectors.at(0) == '|')
+                        {
+                            if(commands.size() == 1)
+                            {
+                                passed = 1;
+                                check_if_test = cnd.check_test(commands.at(0),passed);
+                                if(!check_if_test)
+                                {
+                                    cnd.executecommand(commands.at(0),passed);
+                                }
+                            }
+                            else
+                            {
+                                cnd.mult_commands(commands,connectors,passed);
+                                if(i != command.size() -1)
+                                {
+                                    if(command.at(i) == ')')
+                                    {
+                                        connectors_reverse.clear();
+                                    }
+                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    {
+                                        i += 2;
+                                    }
+                                }
+                            }
+                        }
+                        else if((passed == 0 || passed == 1) && connectors.at(0) == ';')
+                        {
+                            if(commands.size() == 1)
+                            {
+                                passed = 1;
+                                check_if_test = cnd.check_test(commands.at(0),passed);
+                                if(!check_if_test)
+                                {
+                                    cnd.executecommand(commands.at(0),passed);
+                                }
+                            }
+                            else
+                            {
+                                cnd.mult_commands(commands,connectors,passed);
+                                if(i != command.size() -1)
+                                {
+                                    if(command.at(i) == ')')
+                                    {
+                                        connectors_reverse.clear();
+                                    }
+                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    {
+                                        i += 2;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    else if(temp.empty())
+                    {
+                        break;
+                    }
+                }
+            }
         }
         
 };
@@ -743,4 +1935,3 @@ int main()
     }
     return 0;
 }
-
