@@ -5,7 +5,7 @@
 **Rshell** works as a command shell that will prompt the user with `$: ` and take in a command or a series of commands, evaluate the command(s), and execute the command(s).  The user will continously be prompted until `exit` is inputted.  Valid commands may be inputted in the format: `executable [arguementList] [connector cmd]`.  Valid connectors include: `||`, `&&`, and `;`.  The command `test` or `[]` may be utilized to execute a test command in the format: `test -flag path` or `[ -flag path]`.  Valid flags include: `-f`, `-d`, and `-e`.  Flags may be omitted, in which case the default flag, `-e`, will be used.  A user may, also, indicate precedence with the use of `()`.
 
 ##Classes
-Base class `Input` has a member variable `input` of datatype string that stores the entire inputted command line.  `Input`, also, includes two constructors and two other member functions.
+Base class `Input` has a member variable `input` of datatype string that stores the entire inputted command line.  Class `Input`, also, includes two constructors and four other member functions.
 ```
 class Input
 {
@@ -23,7 +23,7 @@ class Input
 ```
 The member function `clear_string()` clears the member variable input.  `getinput(int&)` will get input from the user and store the input into the member variable input.  `get_string()` simply returns input and `check_prec()` returns `true` if there is precedence in the input and `false` if there is not.
 
-Class `Command` inherits from Class `Input` and has a member variable `v`, which is a vector of strings.  Class Command includes one constructor and three member functions.
+Class `Command` inherits from Class `Input` and includes eight member functions.
 ```
 class Command : public Input
 {
@@ -53,7 +53,73 @@ void getinput(int &check)
     check = 0;
 }
 ```
-Here `getinput(int&)` is using `getline(cin, input)` to get input from the user and store it into `input`.  The variable `check`, is of datatype int and passed in by reference to initialize check to 0, as it will later be used to track evaulated connectors. `input` will always will evaluated to check for precedence using the `check_prec()` function.  If `check_prec()` returns false, then each index of the vectors will be tested to check for a `test` command via `check_test(string, int&)`.  If `check_test(string, int&)` returns false, the command will be evaluated via the `exc_command(string, int&)` function of Class `Command`.  However, if `check_test(string, int&)` returns true, then `testcommand(string, int&)` will be used to evaluate the command.
+Here `getinput(int&)` is using `getline(cin, input)` to get input from the user and store it into `input`.  The variable `check`, is of datatype `int` and passed in by reference to initialize `check` to 0, as it will later be used to track evaulated connectors. 
+```
+bool check_prec()
+{
+    for(int i = 0; i < input.size(); ++i)
+    {
+        if(input.at(i) == '(')
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+```
+`input` will always will evaluated to check for precedence using the `check_prec()` function.  If `check_prec()` returns false, meaning no instance of `(` was found, then each index of the vectors will be tested to check for a `test` command via `check_test(string, int&)`.
+```
+bool check_test(string cmd,int& passed)
+{
+    Command test;
+
+    if(cmd.at(0) =='[')
+    {
+        int j = 2;
+        for(int i = 0; i < cmd.size() - 4; ++ i)
+        {
+            cmd.at(i) = cmd.at(j);
+            ++j;
+        }
+
+        cmd.resize(cmd.size()-4);
+        test.testcommand(cmd,passed);
+        
+        return true;
+    }
+
+    string t = "test ";
+    int cnt = 0;
+    if(cmd.size() > 5)
+    {
+        for(unsigned int i = 0; i < 5; ++i)
+        {
+            if(cmd.at(i) == t.at(i))    
+            {
+                ++cnt;
+            }
+        }
+    }
+
+    if(cnt == 5)
+    {
+        for(unsigned int i = 0; i < cmd.size() - 5; ++ i)
+        {
+            cmd.at(i) = cmd.at(cnt);
+            ++cnt;
+        }
+
+        cmd.resize(cmd.size()-5);
+        test.testcommand(cmd,passed);
+        
+        return true;
+    }
+    
+    return false;
+}
+```
+`check_test(string, int&)` checks if a single command begins with `test` or a `[` and will parse out `test` or the `[]` if found, then return `true` or `false` depending on the outcome.  If `check_test(string, int&)` returns false, the command will be evaluated via the `exc_command(string, int&)` function of Class `Command`.  However, if `check_test(string, int&)` returns true, then `testcommand(string, int&)` will be used to evaluate the command.
 
 ### Examples
 Example 1:
@@ -99,18 +165,55 @@ $ [ -e /test/file/path ] && echo “path exists”
 Output:
 ```
 (True)
-path exits
+```
+or
+```
+(False)
 ```
 
 ##Execution with Precedence
 If `check_prec()` returns `true`, then `precedencecommand(string, int&)` will be used to execute each command along with the uses of `ctr_parse(string, vector<char>&)`, `cmd_parse(string, vector<string>&)`, `mult_commands(vector<string> vs1, vector<char>,  int&)`, and  `skip(string, int&)` if applicable.
 
 ###Examples
+Example 1:
 
+Input:
+```
+$: (ls) && (ls)
+```
+Output:
+```
+//List of Directories
+//LIst of Directories
+```
+Example 2:
 
+Input:
+```
+$: (ls && ls) || (ls && ls)
+```
+Output:
+```
+//List of Directories
+//List of Directories
+```
+
+Example 3:
+
+Input:
+```
+$: ls && (ls || ls) && ls
+```
+Output:
+```
+//List of Directories
+//List of Directories
+//List of Directories
+```
 
 
 ## Known Bugs
+### Exit
 In certain cases, where a command has failed, *exit* may be needed to be inputted several times.  However, please note that the program will sucessfully exit after the series of *exit's* have been inputted.  For example:
 ```
 $: cd
@@ -120,20 +223,20 @@ $: exit
 $: exit
 $: exit
 ```
+### Comments
+Any instance of an input that contains comments *and* precedence will skip any command *after* the comment.
+#### Example
 
-Single commands that include comments will print out the entire comment, rather than ignoring the comment.  Multiple commands that include comments execute successfully.  For example:
-
-Single Command:
+Input:
 ```
-$: echo hello #comment
-hello #comment
+$: ls && (ls && ## ls) && ls
 ```
-Multiple Commands:
+Output:
 ```
-$: echo hello ; ls #comment
-hello
+//List of Directories
 //List of Directories
 ```
+***Note: *** *Only the first two `ls` commands were executed and the second two `ls` commands after the comment (`#`) were ignored.*
 
 ## Contributors
 * Sara Hu (https://github.com/shu012)
