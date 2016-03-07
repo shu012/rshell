@@ -1,7 +1,7 @@
 #!/bin/sh
 
 make -C ..
-./../a.out << 'EOF'
+./../bin/rshell << 'EOF'
 (ls && ls) && ls ### ls
 exit
 EOF
