@@ -47,7 +47,7 @@ class Input
         
         bool check_prec()
         {
-            for(int i = 0; i < input.size(); ++i)
+            for(unsigned int i = 0; i < input.size(); ++i)
             {
                 if(input.at(i) == '(')
                 {
@@ -146,7 +146,7 @@ class Command
             if(cmd.at(0) =='[')
             {
                 int j = 2;
-                for(int i = 0; i < cmd.size() - 4; ++ i)
+                for(unsigned int i = 0; i < cmd.size() - 4; ++ i)
                 {
                     cmd.at(i) = cmd.at(j);
                     ++j;
@@ -238,9 +238,9 @@ class Command
         
         void ctr_parse(string temp, vector<char>& connectors)
         {
-            int cnt = connectors.size();
+            //int cnt = connectors.size();
             
-            for(int i = 0; i < temp.size() - 1; ++i)
+            for(unsigned int i = 0; i < temp.size() - 1; ++i)
             {
                 if(temp.at(i) == '&' && temp.at(i + 1) == '&')
                 {
@@ -443,12 +443,12 @@ class Command
             cmncnt = cmdcnt;
         }
         
-        void skip(string command, int& i)
+        void skip(string command, unsigned int& i)
         {
             int beg_par = 0;
             int end_par = 0;
             
-            for(int j = i; j < command.size(); ++j)
+            for(unsigned int j = i; j < command.size(); ++j)
             {
                 if(command.at(j) == '(')
                 {
@@ -469,7 +469,7 @@ class Command
             
             if(beg_par == 0 && end_par == 0)
             {
-                for(int j = i; j < command.size(); ++j)
+                for(unsigned int j = i; j < command.size(); ++j)
                 {
                     if(command.at(j) == '&')
                     {
@@ -494,7 +494,7 @@ class Command
         
         void precedencecommand(string command,int& passed)
         {
-            int i = 0;
+            unsigned int i = 0;
             string temp = "";
             bool check_if_test;
             int found_cmnt = 0;
@@ -610,7 +610,7 @@ class Command
                     {
                         connectors_reverse.clear();
                     }
-                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                    if(i != command.size() && i+1 != command.size())
                     {
                         i += 2;
                     }
@@ -670,7 +670,7 @@ class Command
                         
                         if(commands.size() > 1)
                         {
-                            for(int j = commands.size()-j; i > -1; j--)
+                            for(int j = commands.size()-j; j > -1; j--)
                             {
                                 commands_reverse.push_back(commands.at(j));
                             }
@@ -698,7 +698,7 @@ class Command
                                 {
                                     connectors_reverse.clear();
                                 }
-                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                if(i != command.size() && i+1 != command.size())
                                 {
                                     i += 2;
                                 }
@@ -837,7 +837,7 @@ class Command
                                 {
                                     connectors_reverse.clear();
                                 }
-                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                if(i != command.size() && i+1 != command.size())
                                 {
                                     i += 2;
                                 }
@@ -985,7 +985,7 @@ class Command
                                     connectors_reverse.clear();
                                 }
                                 
-                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                if(i != command.size() && i+1 != command.size())
                                 {
                                     i += 2;
                                 }
@@ -1103,7 +1103,7 @@ class Command
                                 {
                                     connectors_reverse.clear();
                                 }
-                                if(command.at(i) != command.size() && command.at(i + 1) != command.size())
+                                if(i != command.size() && i+1 != command.size())
                                 {
                                     i += 2;
                                 }
@@ -1223,7 +1223,7 @@ class Command
                                 {
                                     connectors_reverse.clear();
                                 }
-                                if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                if(i != command.size() && i+1 != command.size())
                                 {
                                     i += 2;
                                 }
@@ -1340,7 +1340,7 @@ class Command
                                     {
                                         connectors_reverse.clear();
                                     }
-                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    if(i != command.size() && i+1 != command.size())
                                     {
                                         i += 2;
                                     }
@@ -1418,7 +1418,7 @@ class Command
                             
                             if(commands.size() > 1)
                             {
-                                for(int j = commands.size()-j; i > -1; j--)
+                                for(int j = commands.size()-j; j > -1; j--)
                                 {
                                     commands_reverse.push_back(commands.at(j));
                                 }
@@ -1446,7 +1446,7 @@ class Command
                                     {
                                         connectors_reverse.clear();
                                     }
-                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    if(i != command.size() && i+1 != command.size())
                                     {
                                         i += 2;
                                     }
@@ -1531,7 +1531,7 @@ class Command
                                     }
                                     else if(command.at(i) == ' ' && temp.size() == 0)
                                     {
-                                        if(command.at(i+1) == command.size()-1)
+                                        if(i+1 == command.size()-1)
                                         {
                                             break;
                                         }
@@ -1613,7 +1613,7 @@ class Command
                                     {
                                         connectors_reverse.clear();
                                     }
-                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    if(i != command.size() && i+1 != command.size())
                                     {
                                         i += 2;
                                     }
@@ -1645,7 +1645,7 @@ class Command
                                     {
                                         connectors_reverse.clear();
                                     }
-                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    if(i != command.size() && i+1 != command.size())
                                     {
                                         i += 2;
                                     }
@@ -1672,7 +1672,7 @@ class Command
                                     {
                                         connectors_reverse.clear();
                                     }
-                                    if(command.at(i) != command.size() && command.at(i+1) != command.size())
+                                    if(i != command.size() && i+1 != command.size())
                                     {
                                         i += 2;
                                     }
