@@ -1256,6 +1256,7 @@ class Command
                     {
                         if(i == command.size() - 1)
                         {
+                            temp += command.at(i);
                             break;
                         }
                         if(command.at(i) == '(')
